@@ -76,6 +76,21 @@
   text-align: left;
 }
 
+.build-info {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 4px 16px 16px;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+@media (min-width: 700px) {
+  .build-info {
+    max-width: 640px;
+  }
+}
+
 @media print {
   .no-print {
     display: none !important;

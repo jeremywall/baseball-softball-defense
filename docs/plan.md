@@ -388,11 +388,16 @@ the same one every time. Concretely:
 ```
 /
 ├── index.html              # app shell, loads main module
+├── .github/
+│   └── workflows/
+│       └── deploy-pages.yml   # Pages deploy + version.json stamping (§10)
 ├── docs/
 │   └── plan.md
 ├── src/
 │   ├── main.js              # bootstraps app; renders the input state or
 │   │   the result state onto the one page — no router/page state
+│   ├── buildInfo.js          # fetches version.json (cache-busted) and
+│   │   shows the deployed commit SHA in a footer — see §10
 │   ├── models/               # Player, Team, Game, Inning, Position defs;
 │   │   also fairness.js — derived, read-only spread/label computation
 │   │   for the fairness indicator (§5.5); not a rule, doesn't feed the
@@ -455,6 +460,26 @@ the same one every time. Concretely:
   from this repo — no build/publish pipeline required if we avoid a bundler;
   if a bundler is later adopted for convenience, add a simple CI step that
   builds `dist/` and deploys that.
+- **GitHub Pages deploys via a GitHub Actions workflow**
+  (`.github/workflows/deploy-pages.yml`), not the plain "deploy from
+  branch" option, for one reason: it needs to stamp each deploy with the
+  exact commit that triggered it. This is not a build step for the app
+  (no bundling, no transpiling, the site's own files are copied as-is) —
+  the workflow's only job is writing a `version.json` (commit SHA, short
+  SHA, build timestamp, branch) alongside the static files at deploy time,
+  something a plain branch-deploy can't do since the file would need to
+  already be committed before its own commit's SHA exists.
+- **The build-info footer** (`src/buildInfo.js`, rendered at the bottom of
+  the page by `main.js`) fetches `version.json` with caching disabled
+  (`cache: "no-store"`) and displays the short SHA and build time, or
+  "Local build (no version.json)" when that file doesn't exist (plain
+  local dev, no Actions deploy). This exists specifically so a coach (or
+  whoever's debugging) can tell, at a glance and without opening
+  DevTools, whether their browser is actually serving the latest deployed
+  code or a stale cached copy — GitHub Pages serves with a `Cache-Control:
+  max-age=600` header, and the rest of the page (the actual app code) can
+  still be a stale cached copy even when this footer's own fetch — which
+  deliberately bypasses cache — reports the true latest deploy.
 
 ## 11. Open Questions — to resolve when criteria are provided
 

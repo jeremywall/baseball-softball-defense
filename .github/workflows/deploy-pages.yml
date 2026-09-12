@@ -1,0 +1,50 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Writes the exact commit that triggered this deploy into a static
+      # JSON file, so the deployed page can show it (src/buildInfo.js) -
+      # not a build step for the app itself (no bundling/transpiling),
+      # just a version stamp for this one file. See docs/plan.md SS10.
+      - name: Write version.json
+        run: |
+          SHA="${{ github.sha }}"
+          echo "{\"sha\":\"$SHA\",\"shortSha\":\"${SHA:0:7}\",\"builtAt\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"ref\":\"${{ github.ref_name }}\"}" > version.json
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

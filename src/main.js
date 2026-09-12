@@ -1,6 +1,7 @@
 import * as store from "./state/store.js";
 import { renderSetupSection } from "./views/setupView.js";
 import { renderResultsSection } from "./views/resultsView.js";
+import { renderBuildInfo } from "./buildInfo.js";
 
 const app = document.getElementById("app");
 
@@ -20,3 +21,6 @@ function render() {
 
 store.subscribe(render);
 render();
+
+const buildInfoEl = document.getElementById("build-info");
+if (buildInfoEl) renderBuildInfo(buildInfoEl);
