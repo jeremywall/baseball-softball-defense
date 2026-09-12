@@ -8,9 +8,19 @@ export function computeOutfieldCount(alignmentMode, presentCount) {
   return Math.max(0, Math.min(maxOF, available));
 }
 
+// 10-position mode only makes sense with at least 10 present (6
+// infield/battery + 4 outfielders) — with 9 or fewer present, there's no
+// 4th outfielder to field anyway, so fall back to the 9-position mode's
+// labeling (LF/CF/RF) rather than a 10-position mode reduced down to 3
+// outfielders (which would otherwise show as LF/LC/RC).
+export function effectiveAlignmentMode(alignmentMode, presentCount) {
+  return presentCount <= 9 ? 9 : alignmentMode;
+}
+
 export function createGame({ players, presentPlayerIds, numInnings, alignmentMode, pitcherLimit }) {
-  const outfieldCount = computeOutfieldCount(alignmentMode, presentPlayerIds.length);
-  const positions = getFieldPositions(alignmentMode, outfieldCount);
+  const mode = effectiveAlignmentMode(alignmentMode, presentPlayerIds.length);
+  const outfieldCount = computeOutfieldCount(mode, presentPlayerIds.length);
+  const positions = getFieldPositions(mode, outfieldCount);
   const innings = Array.from({ length: numInnings }, (_, i) => ({
     number: i + 1,
     assignments: Object.fromEntries(positions.map((p) => [p.id, null])),
@@ -19,7 +29,7 @@ export function createGame({ players, presentPlayerIds, numInnings, alignmentMod
     players: Object.fromEntries(players.map((p) => [p.id, p.name])),
     presentPlayerIds: [...presentPlayerIds],
     numInnings,
-    alignmentMode,
+    alignmentMode: mode,
     pitcherLimit,
     outfieldCount,
     positions,

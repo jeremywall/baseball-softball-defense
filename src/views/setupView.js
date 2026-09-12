@@ -128,6 +128,14 @@ function renderAlignmentModePicker() {
     label.appendChild(span);
     section.appendChild(label);
   }
+
+  if (store.setup.alignmentMode === 10 && store.presentCount() <= 9 && store.presentCount() > 0) {
+    const hint = document.createElement("p");
+    hint.className = "field-hint";
+    hint.textContent = "10-position mode needs at least 10 present players; 9-position mode will be used instead.";
+    section.appendChild(hint);
+  }
+
   return section;
 }
 

@@ -97,8 +97,9 @@ so they can be built before criteria are finalized:
   per-game setting the user picks (see §5 Game setup):
   - **9-position mode**: the standard positions above (3 outfielders).
   - **10-position mode**: the same infield/battery plus a 4th outfielder
-    (e.g. splitting the outfield into LF/LC/RC/RF, naming TBD alongside the
-    rest of the criteria).
+    (splitting the outfield into LF/LC/RC/RF). Only used when at least 10
+    players are present — see §5 (Alignment mode) for the automatic
+    fallback to 9-position mode below that.
   Position definitions live in one config module keyed by alignment mode, so
   the result tables, rules engine, and auto-suggest all read from the same
   source rather than hardcoding a position count. Each position also
@@ -168,7 +169,15 @@ source.
      of outfielders; the actual number used also depends on attendance —
      see HR-7 in §6.1, which fills the 6 infield/battery positions first
      and reduces the outfield count (not the infield count) when fewer
-     players are present than the mode calls for.
+     players are present than the mode calls for. Separately, **10-position
+     mode requires at least 10 present players to mean anything** (6
+     infield/battery + 4 outfielders) — with 9 or fewer present, the app
+     automatically generates a 9-position alignment instead, regardless of
+     which radio is selected, with a hint shown in this section explaining
+     why. This keeps the labeling honest: a reduced-outfield 10-position
+     game would otherwise show the 10-position mode's LF/LC/RC outfield
+     naming for what's actually a 3-outfielder alignment, instead of the
+     9-position mode's familiar LF/CF/RF.
    - **Pitcher inning limit**: a checkbox toggling whether pitchers are
      limited to 1 inning per game (checked) or may pitch up to 2 innings
      (unchecked) — see HR-9 in §6.1.
