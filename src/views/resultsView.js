@@ -1,6 +1,5 @@
 import * as store from "../state/store.js";
-import { labelFor } from "../models/positions.js";
-import { nameOf } from "../models/game.js";
+import { nameOf, inningStatusForPlayer } from "../models/game.js";
 import { countCategories } from "../models/stats.js";
 import { validateAll, validateSoft } from "../rules/index.js";
 
@@ -72,16 +71,15 @@ function renderAssignmentGrid(game) {
   table.appendChild(thead);
 
   const tbody = document.createElement("tbody");
-  for (const pos of game.positions) {
+  for (const pid of game.presentPlayerIds) {
     const row = document.createElement("tr");
     const rowHead = document.createElement("th");
     rowHead.scope = "row";
-    rowHead.textContent = labelFor(game.alignmentMode, pos.id);
+    rowHead.textContent = nameOf(game, pid);
     row.appendChild(rowHead);
     for (const inning of game.innings) {
       const td = document.createElement("td");
-      const pid = inning.assignments[pos.id];
-      td.textContent = pid ? nameOf(game, pid) : "—";
+      td.textContent = inningStatusForPlayer(inning, pid) ?? "—";
       row.appendChild(td);
     }
     tbody.appendChild(row);

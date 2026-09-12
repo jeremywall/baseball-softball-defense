@@ -191,9 +191,12 @@ source.
    intermediate manual-assignment step — generation *is* the feature.
 4. **Result tables** — the result state shows two tables, and nothing
    else needs building or editing by hand:
-   - **Assignment grid**: rows are positions, columns are innings (or vice
-     versa), each cell the assigned player's name — the full inning-by-
-     inning lineup at a glance.
+   - **Assignment grid**: rows are present players (by name), columns are
+     innings, and each cell shows the position abbreviation that player
+     plays that inning — **P, C, 1B, 2B, 3B, SS, LF, LC, RC, RF** (LC/RC
+     only appear in 10-position-mode games, §4/§5), or **BN** for a bench
+     inning. The full inning-by-inning lineup at a glance, indexed by
+     player rather than by position.
    - **Player summary**: one row per present player, with columns for
      innings played at **Pitcher, Catcher, Infield (1B/2B/3B/SS),
      Outfield, and Bench** — five mutually-exclusive counts that add up to
