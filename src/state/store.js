@@ -30,6 +30,7 @@ let game = null;
 export function toggleAttendance(playerId) {
   if (setup.attendance.has(playerId)) setup.attendance.delete(playerId);
   else setup.attendance.add(playerId);
+  autoSelectAlignmentMode();
   notify();
 }
 
@@ -41,7 +42,17 @@ export function toggleAllAttendance() {
   } else {
     for (const p of players) setup.attendance.add(p.id);
   }
+  autoSelectAlignmentMode();
   notify();
+}
+
+// Keeps the alignment-mode radio in sync with attendance (docs/plan.md
+// §5): 9 or fewer present selects 9-position mode, 10+ selects
+// 10-position mode. The radio stays manually clickable in between
+// attendance changes — this just sets the default every time attendance
+// changes, it doesn't disable the choice.
+function autoSelectAlignmentMode() {
+  setup.alignmentMode = presentCount() <= 9 ? 9 : 10;
 }
 
 export function setNumInnings(n) {

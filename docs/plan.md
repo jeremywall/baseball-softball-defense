@@ -165,19 +165,22 @@ source.
      actually plays — **6, 7, 8, or 9** — rather than a free-entry number
      field.
    - **Alignment mode**: 9 defensive positions (3 outfielders) or 10
-     defensive positions (4 outfielders). This sets the *maximum* number
-     of outfielders; the actual number used also depends on attendance —
-     see HR-7 in §6.1, which fills the 6 infield/battery positions first
-     and reduces the outfield count (not the infield count) when fewer
-     players are present than the mode calls for. Separately, **10-position
-     mode requires at least 10 present players to mean anything** (6
-     infield/battery + 4 outfielders) — with 9 or fewer present, the app
-     automatically generates a 9-position alignment instead, regardless of
-     which radio is selected, with a hint shown in this section explaining
-     why. This keeps the labeling honest: a reduced-outfield 10-position
-     game would otherwise show the 10-position mode's LF/LC/RC outfield
-     naming for what's actually a 3-outfielder alignment, instead of the
-     9-position mode's familiar LF/CF/RF.
+     defensive positions (4 outfielders), as two radio buttons. This sets
+     the *maximum* number of outfielders; the actual number used also
+     depends on attendance — see HR-7 in §6.1, which fills the 6
+     infield/battery positions first and reduces the outfield count (not
+     the infield count) when fewer players are present than the mode
+     calls for. **The radio auto-selects with attendance**: every time a
+     checkbox is toggled (including via "All Present"), the mode is reset
+     to 9-position for 9 or fewer present, or 10-position for 10 or more —
+     since a 4th outfielder needs at least 10 players (6 infield/battery +
+     4) to mean anything. The radio stays clickable in between attendance
+     changes for a manual override, but the next attendance change resets
+     it back to the attendance-driven default; either way, generation
+     itself (`createGame`, §7) enforces the same 9-or-fewer-present → 9-
+     position rule as a final safeguard, so a manual override can't
+     produce a mislabeled reduced-outfield 10-position game (e.g. showing
+     LF/LC/RC for what's actually a 3-outfielder alignment).
    - **Pitcher inning limit**: a checkbox toggling whether pitchers are
      limited to 1 inning per game (checked) or may pitch up to 2 innings
      (unchecked) — see HR-9 in §6.1.

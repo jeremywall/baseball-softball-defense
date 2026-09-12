@@ -30,6 +30,31 @@ test("toggleAllAttendance: marks everyone present even if some were already chec
   assert.equal(store.presentCount(), store.players.length);
 });
 
+test("alignment mode auto-selects with attendance: 9 or fewer present picks 9-position, 10+ picks 10-position", () => {
+  reset();
+  for (let i = 0; i < 9; i++) store.toggleAttendance(store.players[i].id);
+  assert.equal(store.presentCount(), 9);
+  assert.equal(store.setup.alignmentMode, 9);
+
+  store.toggleAttendance(store.players[9].id); // 10th present
+  assert.equal(store.presentCount(), 10);
+  assert.equal(store.setup.alignmentMode, 10);
+
+  store.toggleAttendance(store.players[9].id); // back down to 9 present
+  assert.equal(store.presentCount(), 9);
+  assert.equal(store.setup.alignmentMode, 9);
+});
+
+test("alignment mode auto-selects via All Present too", () => {
+  reset();
+  assert.ok(store.players.length >= 10); // the embedded roster has more than 10 names
+  store.toggleAllAttendance();
+  assert.equal(store.setup.alignmentMode, 10);
+
+  store.toggleAllAttendance();
+  assert.equal(store.setup.alignmentMode, 9);
+});
+
 test("assignPositions: does nothing below the HR-7 minimum of 7 present", () => {
   reset();
   store.toggleAttendance(store.players[0].id);
