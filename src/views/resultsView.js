@@ -1,10 +1,12 @@
 import * as store from "../state/store.js";
 import { nameOf, inningStatusForPlayer } from "../models/game.js";
 import { countCategories } from "../models/stats.js";
+import { computeFairness } from "../models/fairness.js";
 import { validateAll, validateSoft } from "../rules/index.js";
 
-// Result state (docs/plan.md §3, §5.4-5.6): the two output tables, a
-// non-blocking rule check, and Regenerate/Start Over. No manual editing.
+// Result state (docs/plan.md §3, §5.4-5.7): the two output tables, the
+// fairness indicator, a non-blocking rule check, and Regenerate/Start
+// Over. No manual editing.
 export function renderResultsSection(container) {
   const game = store.getGame();
   if (!game) return;
@@ -18,6 +20,7 @@ export function renderResultsSection(container) {
   container.appendChild(renderActions());
   container.appendChild(renderAssignmentGrid(game));
   container.appendChild(renderPlayerSummary(game));
+  container.appendChild(renderFairnessIndicator(game));
   container.appendChild(renderRuleCheck(game));
   container.appendChild(renderSoftNotices(game));
 }
@@ -128,6 +131,31 @@ function renderPlayerSummary(game) {
   table.appendChild(tbody);
   wrap.appendChild(table);
   return wrap;
+}
+
+// Fairness indicator (docs/plan.md §5.5) — a derived, read-only readout,
+// not a rule: it doesn't feed the generator and nothing here blocks
+// anything. Just a quick signal for whether Regenerate is worth a tap.
+function renderFairnessIndicator(game) {
+  const section = document.createElement("section");
+  section.className = "validation-panel";
+  const heading = document.createElement("h2");
+  heading.textContent = "Fairness";
+  section.appendChild(heading);
+
+  const { label, benchSpread, infieldSpread, outfieldSpread } = computeFairness(game);
+
+  const badge = document.createElement("p");
+  badge.className = `fairness-badge fairness-${label.toLowerCase()}`;
+  badge.textContent = label;
+  section.appendChild(badge);
+
+  const detail = document.createElement("p");
+  detail.className = "field-hint";
+  detail.textContent = `Spread across present players — bench: ±${benchSpread}, infield: ±${infieldSpread}, outfield: ±${outfieldSpread} inning(s).`;
+  section.appendChild(detail);
+
+  return section;
 }
 
 function renderRuleCheck(game) {

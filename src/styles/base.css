@@ -8,6 +8,7 @@
   --accent: #1f6f43;
   --accent-text: #ffffff;
   --danger: #b3261e;
+  --warn: #a06600;
   --touch-min: 44px;
 }
 
@@ -21,6 +22,7 @@
     --accent: #3fae74;
     --accent-text: #06170d;
     --danger: #ff8079;
+    --warn: #f2b84b;
   }
 }
 

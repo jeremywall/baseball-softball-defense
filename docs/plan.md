@@ -208,13 +208,41 @@ source.
      a glance.)
    Both tables are visible at the same time, on the same screen, with no
    navigation between them.
-5. **Rule check** — a short, informational list of any hard-rule
+5. **Fairness indicator** — a compact, at-a-glance readout of how evenly
+   this specific generated alignment spread playing time across present
+   players, shown right above the Rule Check panel. It exists because the
+   hard rules (§6.1) only enforce *minimums* (e.g. HR-6's "at least 2
+   infield innings") — two alignments can both pass every hard rule while
+   one spreads bench/infield/outfield time far more evenly than the
+   other, and without this the coach would have to read every row of the
+   player summary table to notice that difference before deciding whether
+   Regenerate (§3) is worth a tap.
+   - **What it measures**: for the present players, the *spread* (max
+     minus min across players) of each of three counts already shown in
+     the player summary table — bench innings, infield innings, and
+     outfield innings. A spread of 0 means every present player got the
+     exact same count of that category; a spread of 3 means the least-
+     and most-favored players differed by 3 innings in it.
+   - **Label**: the worst (largest) of the three spreads maps to a plain
+     label — **Excellent** (max spread ≤ 1 inning), **Good** (≤ 2), or
+     **Uneven** (> 2) — plus the three raw spread numbers themselves (e.g.
+     "bench ±1, infield ±2, outfield ±1"), so the coach sees both the
+     quick read and the actual numbers behind it rather than an opaque
+     score.
+   - **Deliberately not a 0-100 "score."** A made-up composite number
+     would be harder to justify, test, and explain than three plain
+     inning-count spreads plus a label — this stays a derived, read-only
+     indicator, not a new rule: it doesn't feed back into the generator's
+     scoring (§6.3) and nothing here is validated or blocking like §6.1/
+     §6.2. If it consistently reads "Uneven," that's a signal to tap
+     Regenerate, not something the app tries to fix on its own.
+6. **Rule check** — a short, informational list of any hard-rule
    violations (§6.1) and soft-rule notices (§6.2) the generated alignment
-   still has, shown below the tables. It's informational only: there is no
-   manual-edit path to resolve a violation, so the expected response to
-   seeing one is to tap **Regenerate** (§3) for a different alignment, not
-   to fix it by hand.
-6. **Regenerate / Start Over** — Regenerate re-runs generation with a new
+   still has, shown below the fairness indicator. It's informational
+   only: there is no manual-edit path to resolve a violation, so the
+   expected response to seeing one is to tap **Regenerate** (§3) for a
+   different alignment, not to fix it by hand.
+7. **Regenerate / Start Over** — Regenerate re-runs generation with a new
    random alignment (§6.3) without touching attendance or options; Start
    Over clears the result and returns to the input state so attendance can
    be rechecked for a different game. Printing (browser print) works
@@ -344,7 +372,10 @@ the same one every time. Concretely:
 ├── src/
 │   ├── main.js              # bootstraps app; renders the input state or
 │   │   the result state onto the one page — no router/page state
-│   ├── models/               # Player, Team, Game, Inning, Position defs
+│   ├── models/               # Player, Team, Game, Inning, Position defs;
+│   │   also fairness.js — derived, read-only spread/label computation
+│   │   for the fairness indicator (§5.5); not a rule, doesn't feed the
+│   │   generator
 │   ├── data/
 │   │   └── roster.js          # embedded season roster — edit for new season
 │   ├── state/                # in-memory store (session-only, no persistence)
@@ -355,8 +386,9 @@ the same one every time. Concretely:
 │   │   path to an alignment; see §6.3 for its randomization requirement
 │   ├── views/                 # setupView (input state: attendance +
 │   │   options + Assign Positions) and resultsView (result state: the
-│   │   two tables, rule check, Regenerate/Start Over) — no alignment/
-│   │   field-diagram view, since there's nothing to hand-edit
+│   │   two tables, fairness indicator, rule check, Regenerate/Start
+│   │   Over) — no alignment/field-diagram view, since there's nothing
+│   │   to hand-edit
 │   └── styles/
 │       ├── base.css           # resets, tokens, typography
 │       ├── layout.css         # mobile-first layout & breakpoints
@@ -374,8 +406,9 @@ the same one every time. Concretely:
    attendance + options straight to a complete, rule-satisfying alignment;
    since there's no manual-assignment UI to fall back on, this needs to be
    solid before anything else is worth polishing.
-5. **Result tables** — the assignment grid and player summary (§5.4), plus
-   the rule-check panel (§5.5) and Regenerate/Start Over (§5.6).
+5. **Result tables** — the assignment grid and player summary (§5.4), the
+   fairness indicator (§5.5), the rule-check panel (§5.6), and
+   Regenerate/Start Over (§5.7).
 6. **Polish** — print styling, offline support, accessibility pass,
    cross-device testing on real phones.
 
@@ -405,7 +438,7 @@ the same one every time. Concretely:
 ## 11. Open Questions — to resolve when criteria are provided
 
 - What are the exact hard constraints (must never be violated) vs. soft
-  preferences (informational only, per §5.5/§6.2)?
+  preferences (informational only, per §5.6/§6.2)?
 - Baseball vs. softball vs. both — any rule or position-set differences?
 - What playing-time/position-variety rules apply (e.g. league mandates
   minimum innings, no repeat position two games in a row, pitch-count

@@ -12,11 +12,10 @@ Ideas are grouped loosely by theme.
   Regenerate button, generate 2-3 candidate alignments side by side (or
   swipeable on phone) and let the coach pick a favorite. Same one-button
   philosophy, just three outputs instead of one per tap.
-- **A visible fairness score.** Alongside the Rule Check panel, show a
-  single at-a-glance number or bar (e.g. "playing time spread: tight" vs.
-  "wide") summarizing how evenly infield/outfield/bench time landed
-  across players this run, so a coach can decide whether Regenerate is
-  worth tapping without reading every row of the summary table.
+- ~~**A visible fairness score.**~~ **Implemented** — see
+  `docs/plan.md` §5.5 and `src/models/fairness.js`: a bench/infield/
+  outfield spread readout with an Excellent/Good/Uneven label, shown
+  above the Rule Check panel.
 - **Lightweight "lock" constraints.** Not full manual assignment (that's
   deliberately out of scope, per `docs/plan.md` §1/§5) — but a small,
   optional set of pre-generation constraints like "Ben pitches this game"
