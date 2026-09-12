@@ -1,7 +1,8 @@
-// Position definitions, keyed by alignment mode. Everything else (field
-// diagram, rules engine, auto-suggest) reads from this one module rather
-// than hardcoding a position count, so the 9- vs 10-position modes stay
-// consistent everywhere.
+// Position definitions, keyed by alignment mode and (for the outfield)
+// attendance count. Everything else (rules engine, auto-suggest, result
+// views) reads from this one module rather than hardcoding a position
+// count or label, so every present-count case (§4/§5) stays consistent
+// everywhere.
 
 export const INFIELD_POSITIONS = [
   { id: "P", label: "Pitcher" },
@@ -12,19 +13,21 @@ export const INFIELD_POSITIONS = [
   { id: "SS", label: "Shortstop" },
 ];
 
+const LF = { id: "LF", label: "Left Field" };
+const CF = { id: "CF", label: "Center Field" };
+const RF = { id: "RF", label: "Right Field" };
+const LC = { id: "LC", label: "Left-Center Field" };
+const RC = { id: "RC", label: "Right-Center Field" };
+
 export const OUTFIELD_POSITIONS_BY_MODE = {
-  9: [
-    { id: "LF", label: "Left Field" },
-    { id: "CF", label: "Center Field" },
-    { id: "RF", label: "Right Field" },
-  ],
-  10: [
-    { id: "LF", label: "Left Field" },
-    { id: "LC", label: "Left-Center Field" },
-    { id: "RC", label: "Right-Center Field" },
-    { id: "RF", label: "Right Field" },
-  ],
+  9: [LF, CF, RF],
+  10: [LF, LC, RC, RF],
 };
+
+// A 2-outfielder alignment (exactly 7 or 8 present, per HR-7) always
+// covers the left-center/right-center gaps rather than reusing the
+// 9-position mode's first two slots — LC/RC, never LF/CF.
+const TWO_OUTFIELDER_POSITIONS = [LC, RC];
 
 export const BENCH = { id: "BN", label: "Bench" };
 
@@ -49,8 +52,10 @@ export function infieldPositionsFor(presentCount) {
 
 // The set of outfield positions actually used this game, given how many
 // outfield slots attendance allows (HR-7: shortfall reduces outfield, not
-// infield/battery).
+// infield/battery). A 2-outfielder count always means LC/RC (7- or
+// 8-present), regardless of alignment mode.
 export function getOutfieldPositions(mode, outfieldCount) {
+  if (outfieldCount === 2) return TWO_OUTFIELDER_POSITIONS;
   return OUTFIELD_POSITIONS_BY_MODE[mode].slice(0, outfieldCount);
 }
 
@@ -68,10 +73,4 @@ export function categoryOf(positionId) {
   if (positionId === BENCH.id) return "bench";
   if (INFIELD_IDS.has(positionId)) return "infield";
   return "outfield";
-}
-
-export function labelFor(mode, positionId) {
-  if (positionId === BENCH.id) return BENCH.label;
-  const all = [...INFIELD_POSITIONS, ...OUTFIELD_POSITIONS_BY_MODE[mode]];
-  return all.find((p) => p.id === positionId)?.label ?? positionId;
 }

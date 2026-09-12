@@ -37,16 +37,40 @@ test("createGame: 10-position mode requested with 9 present actually builds a 9-
   assert.ok(!positionIds.includes("LC"));
 });
 
-test("createGame: exactly 7 present has no catcher position and 2 outfielders", () => {
+test("createGame: exactly 7 present has no catcher, and 2 outfielders labeled LC/RC (not LF/CF)", () => {
   const game = makeGame({ playerCount: 7, numInnings: 6, alignmentMode: 9, pitcherLimit: 2 });
   const positionIds = game.positions.map((p) => p.id);
   assert.ok(!positionIds.includes("C"));
   assert.equal(game.outfieldCount, 2);
   assert.equal(positionIds.length, 7); // P, 1B, 2B, 3B, SS, + 2 outfielders
+  assert.deepEqual(
+    positionIds.filter((id) => ["LF", "CF", "RF", "LC", "RC"].includes(id)).sort(),
+    ["LC", "RC"],
+  );
 });
 
-test("createGame: 8 present still has a catcher (7-present drop is exact, not <=7)", () => {
+test("createGame: exactly 8 present has a catcher, and 2 outfielders still labeled LC/RC", () => {
   const game = makeGame({ playerCount: 8, numInnings: 6, alignmentMode: 9, pitcherLimit: 2 });
   const positionIds = game.positions.map((p) => p.id);
   assert.ok(positionIds.includes("C"));
+  assert.equal(game.outfieldCount, 2);
+  assert.deepEqual(
+    positionIds.filter((id) => ["LF", "CF", "RF", "LC", "RC"].includes(id)).sort(),
+    ["LC", "RC"],
+  );
+});
+
+test("createGame: exactly 9 present uses the standard 9 baseball positions (LF/CF/RF)", () => {
+  const game = makeGame({ playerCount: 9, numInnings: 6, alignmentMode: 9, pitcherLimit: 2 });
+  const positionIds = game.positions.map((p) => p.id);
+  assert.deepEqual(positionIds.sort(), ["1B", "2B", "3B", "C", "CF", "LF", "P", "RF", "SS"]);
+});
+
+test("createGame: 10+ present uses the softball-style 4-outfielder layout (LF/LC/RC/RF)", () => {
+  const game = makeGame({ playerCount: 10, numInnings: 6, alignmentMode: 10, pitcherLimit: 2 });
+  const positionIds = game.positions.map((p) => p.id);
+  assert.deepEqual(
+    positionIds.filter((id) => ["LF", "CF", "RF", "LC", "RC"].includes(id)).sort(),
+    ["LC", "LF", "RC", "RF"],
+  );
 });

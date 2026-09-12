@@ -92,26 +92,42 @@ so they can be built before criteria are finalized:
 - **Inning**: number, mapping of Position → Player (or empty/bench), plus
   which players are sitting out that inning.
 - **Position**: the standard defensive positions (Pitcher, Catcher, 1B, 2B,
-  3B, SS, LF, CF, RF) plus "Bench"/"Out" for players not on the field. The
-  set of fielded positions depends on the game's **alignment mode**, a
-  per-game setting the user picks (see §5 Game setup):
-  - **9-position mode**: the standard positions above (3 outfielders).
-  - **10-position mode**: the same infield/battery plus a 4th outfielder
-    (splitting the outfield into LF/LC/RC/RF). Only used when at least 10
-    players are present — see §5 (Alignment mode) for the automatic
-    fallback to 9-position mode below that.
-  Position definitions live in one config module keyed by alignment mode, so
-  the result tables, rules engine, and auto-suggest all read from the same
-  source rather than hardcoding a position count. Each position also
-  carries a **category** used for the "innings played in infield/outfield"
-  hard rules (HR-2, HR-5, HR-6 in §6.1): `infield` — **Pitcher, Catcher,
-  1B, 2B, 3B, SS** (per league convention, the battery positions count as
-  infield for these rules) — `outfield` (LF/CF/RF, plus the 4th outfielder
-  in 10-position mode), or `bench`. Individual position identity (e.g.
-  distinguishing Catcher from Pitcher) is always still tracked separately
-  from category, since some rules key off the specific position rather
-  than the category (e.g. HR-1, which is about catcher and pitcher
-  specifically).
+  3B, SS, LF, CF, RF, LC, RC) plus "Bench"/"Out" for players not on the
+  field. The set of fielded positions depends on the game's **alignment
+  mode** (a per-game setting the user picks, see §5) *and* attendance —
+  the exact outfield labeling is a direct function of how many players are
+  actually present, not just which of the two radio buttons is selected:
+  - **Exactly 7 present**: HR-7's special case (§6.1) — no catcher; 5
+    infield/battery (P, 1B, 2B, 3B, SS) + **2 outfielders, labeled LC and
+    RC** (Left-Center, Right-Center) rather than LF/CF.
+  - **Exactly 8 present**: full infield/battery including catcher (P, C,
+    1B, 2B, 3B, SS) + **2 outfielders, also labeled LC and RC** — the same
+    2-outfielder LC/RC convention as the 7-present case, just with a
+    catcher restored.
+  - **Exactly 9 present**: the standard 9 baseball positions — P, C, 1B,
+    2B, 3B, SS, LF, CF, RF (3 outfielders, the traditional layout).
+  - **10 or more present**: the "softball style" 4-outfielder layout — P,
+    C, 1B, 2B, 3B, SS, LF, LC, RC, RF.
+  In other words, **a 2-outfielder alignment (7 or 8 present) always uses
+  LC/RC, never LF/CF** — a deliberate choice to cover the left-center and
+  right-center gaps with only two outfielders, rather than reusing the
+  9-position mode's first two slots. The 9-position/10-position radio
+  buttons (§5) still drive the *3-vs-4-outfielder* choice at 9 vs. 10+
+  present; they don't affect the 7-and-8-present cases, which always use
+  the 2-outfielder LC/RC layout regardless of which radio is selected.
+  Position definitions live in one config module, so the result tables,
+  rules engine, and auto-suggest all read from the same source rather than
+  hardcoding a position count or label. Each position also carries a
+  **category** used for the "innings played in infield/outfield" hard
+  rules (HR-2, HR-5, HR-6 in §6.1): `infield` — **Pitcher, Catcher, 1B,
+  2B, 3B, SS** (per league convention, the battery positions count as
+  infield for these rules; Catcher is simply absent from the position set
+  in a 7-present game) — `outfield` (LF/CF/RF, LC/RC, or LF/LC/RC/RF
+  depending on the case above), or `bench`. Individual position identity
+  (e.g. distinguishing Catcher from Pitcher) is always still tracked
+  separately from category, since some rules key off the specific
+  position rather than the category (e.g. HR-1, which is about catcher
+  and pitcher specifically).
 - **Constraint/Rule**: a named, independently pluggable unit (see §6) that
   can validate an Inning or a whole Game and report violations/warnings.
 
@@ -170,9 +186,10 @@ source.
      depends on attendance — see HR-7 in §6.1, which fills the
      infield/battery positions first and reduces the outfield count (not
      the infield count) when fewer players are present than the mode
-     calls for, except at exactly 7 present (HR-7's special case: catcher
-     dropped for a 2nd outfielder instead). **The radio auto-selects with
-     attendance**: every time a
+     calls for, except at exactly 7 or 8 present (HR-7's special case: a
+     2-outfielder alignment labeled LC/RC — see §4 for the full breakdown
+     by attendance count). **The radio auto-selects with attendance**:
+     every time a
      checkbox is toggled (including via "All Present"), the mode is reset
      to 9-position for 9 or fewer present, or 10-position for 10 or more —
      since a 4th outfielder needs at least 10 players (6 infield/battery +
@@ -310,7 +327,7 @@ rules as they're provided; each entry should become one rule module under
 | HR-4 | No player may be benched for a second inning until every present player has been benched at least once in that game (i.e. bench turns must round-robin through the full present roster before anyone repeats). |
 | HR-5 | Every player must play at least one inning of infield within the first 3 innings of the game. |
 | HR-6 | Every player must play a minimum of 2 innings in the infield in a game. |
-| HR-7 | A game requires a minimum of 7 present players to be played. When fewer players are present than the chosen alignment mode's full complement (9 or 10), the shortfall is absorbed by fielding fewer outfielders rather than leaving an infield/battery position empty — **except at exactly 7 present**, where the catcher position is dropped in favor of a 2nd outfielder instead (Pitcher, 1B, 2B, 3B, SS + 2 outfielders = 7), rather than a full catcher/infield complement behind a single lone outfielder. This means the outfield count never actually drops below 2 at any playable attendance: 2 at exactly 7 present (via the catcher swap), and at least 2 at 8+ present (8 − 6 infield/battery = 2). At 8 or more present, all 6 infield/battery positions (Catcher, Pitcher, 1B, 2B, 3B, SS) are filled every inning as before. |
+| HR-7 | A game requires a minimum of 7 present players to be played. When fewer players are present than the chosen alignment mode's full complement (9 or 10), the shortfall is absorbed by fielding fewer outfielders rather than leaving an infield/battery position empty — **except at exactly 7 present**, where the catcher position is dropped in favor of a 2nd outfielder instead (Pitcher, 1B, 2B, 3B, SS + 2 outfielders = 7), rather than a full catcher/infield complement behind a single lone outfielder. This means the outfield count never actually drops below 2 at any playable attendance: 2 at exactly 7 present (via the catcher swap), and at least 2 at 8+ present (8 − 6 infield/battery = 2). At 8 or more present, all 6 infield/battery positions (Catcher, Pitcher, 1B, 2B, 3B, SS) are filled every inning as before. **A 2-outfielder alignment (whether at 7 or 8 present) is always labeled LC/RC** (Left-Center, Right-Center), never LF/CF — see §4 for the full breakdown by attendance count. |
 | HR-8 | Every present player must play a defensive position (any position, not bench) for at least 2 full innings in the game. |
 | HR-9 | A player may pitch at most 1 inning per game if the game's "Pitcher inning limit" setting is on, or at most 2 innings per game if it's off (see Game setup, §5). This is a per-game configurable limit, not a fixed constant — the rules engine reads the max from the game's setting rather than hardcoding it. |
 | HR-10 | Once a player is moved off the pitcher position, they cannot pitch again later in the same game — even if they haven't yet reached the HR-9 innings limit. A player's pitching innings must be one uninterrupted stint at pitcher; there's no returning to pitch after being pulled. |
