@@ -1,0 +1,101 @@
+.attendance-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px 12px;
+}
+
+.attendance-item,
+.radio-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--touch-min);
+}
+
+.attendance-item input,
+.radio-item input {
+  width: 20px;
+  height: 20px;
+}
+
+.field-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.field-select {
+  min-height: var(--touch-min);
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.field-hint {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+button.primary-action,
+button.secondary-action {
+  min-height: var(--touch-min);
+  border-radius: 10px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button.primary-action {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+button.primary-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button.secondary-action {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+button.text-action {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-weight: 600;
+  min-height: var(--touch-min);
+  cursor: pointer;
+}
+
+.validation-ok {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.notice-list {
+  margin: 0;
+  padding-left: 1.2em;
+  color: var(--text-muted);
+}
+
+.notice-list li {
+  margin-bottom: 6px;
+}
+
+.violation-list {
+  margin: 0;
+  padding-left: 1.2em;
+  color: var(--danger);
+}
+
+.violation-list li {
+  margin-bottom: 6px;
+}

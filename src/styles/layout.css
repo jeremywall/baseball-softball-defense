@@ -1,0 +1,87 @@
+#app {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
+  padding-bottom: 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 700px) {
+  #app {
+    max-width: 640px;
+    padding-bottom: 32px;
+  }
+}
+
+.view-title {
+  font-size: 1.4rem;
+}
+
+.setup-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.attendance-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.validation-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.align-actions {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  gap: 8px;
+  padding: 8px 0;
+  background: linear-gradient(to top, var(--bg) 70%, transparent);
+}
+
+.align-actions > button {
+  flex: 1;
+}
+
+.grid-scroll {
+  overflow-x: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.review-grid {
+  width: 100%;
+  font-size: 0.85rem;
+}
+
+.review-grid th,
+.review-grid td {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.review-grid th[scope="row"] {
+  text-align: left;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  #app {
+    max-width: none;
+    padding: 0;
+  }
+}
