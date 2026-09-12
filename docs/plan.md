@@ -469,7 +469,13 @@ the same one every time. Concretely:
   the workflow's only job is writing a `version.json` (commit SHA, short
   SHA, build timestamp, branch) alongside the static files at deploy time,
   something a plain branch-deploy can't do since the file would need to
-  already be committed before its own commit's SHA exists.
+  already be committed before its own commit's SHA exists. Third-party
+  actions in that workflow (`actions/checkout`, `actions/configure-pages`,
+  `actions/upload-pages-artifact`, `actions/deploy-pages`) are pinned to
+  immutable commit SHAs (with the version as a trailing comment), not
+  mutable version tags like `@v7` — standard supply-chain hygiene for CI,
+  since a tag can be moved to point at different code later but a commit
+  SHA can't.
 - **The build-info readout** (`src/buildInfo.js`) sits in the page's
   persistent header (`index.html`'s `<header class="app-header">`), at
   the top right, opposite the page title ("Game Setup" / "Alignment") on
