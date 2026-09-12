@@ -484,7 +484,10 @@ the same one every time. Concretely:
   with a `Cache-Control: max-age=600` header, and the rest of the page
   (the actual app code) can still be a stale cached copy even when this
   readout's own fetch — which deliberately bypasses cache — reports the
-  true latest deploy.
+  true latest deploy. (Currently hidden via CSS — `display: none` on
+  `.build-info` in `layout.css` — while its exact placement is still
+  being sorted out; the element and its fetch logic are left in place so
+  it can be re-enabled by removing that one line.)
 
 ## 11. Open Questions — to resolve when criteria are provided
 

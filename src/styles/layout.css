@@ -91,6 +91,10 @@
 }
 
 .build-info {
+  /* Hidden for now (layout still being sorted out) — kept in the DOM and
+     still fetching version.json, just not displayed. Remove this line to
+     bring it back once the top-right placement is confirmed correct. */
+  display: none;
   flex-shrink: 0;
   color: var(--text-muted);
   font-size: 0.7rem;
