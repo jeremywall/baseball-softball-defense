@@ -5,11 +5,6 @@ import * as store from "../state/store.js";
 export function renderSetupSection(container) {
   container.innerHTML = "";
 
-  const heading = document.createElement("h1");
-  heading.className = "view-title";
-  heading.textContent = "Game Setup";
-  container.appendChild(heading);
-
   container.appendChild(renderAttendance());
   container.appendChild(renderInningsPicker());
   container.appendChild(renderAlignmentModePicker());

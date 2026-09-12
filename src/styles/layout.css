@@ -1,3 +1,13 @@
+.app-header {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px 16px 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 #app {
   max-width: 480px;
   margin: 0 auto;
@@ -9,13 +19,17 @@
 }
 
 @media (min-width: 700px) {
+  .app-header,
   #app {
     max-width: 640px;
+  }
+  #app {
     padding-bottom: 32px;
   }
 }
 
 .view-title {
+  margin: 0;
   font-size: 1.4rem;
 }
 
@@ -77,24 +91,18 @@
 }
 
 .build-info {
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 4px 16px 16px;
+  flex-shrink: 0;
   color: var(--text-muted);
-  font-size: 0.75rem;
-  text-align: center;
-}
-
-@media (min-width: 700px) {
-  .build-info {
-    max-width: 640px;
-  }
+  font-size: 0.7rem;
+  text-align: right;
+  white-space: nowrap;
 }
 
 @media print {
   .no-print {
     display: none !important;
   }
+  .app-header,
   #app {
     max-width: none;
     padding: 0;

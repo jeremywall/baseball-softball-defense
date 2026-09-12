@@ -12,11 +12,6 @@ export function renderResultsSection(container) {
   if (!game) return;
   container.innerHTML = "";
 
-  const heading = document.createElement("h1");
-  heading.className = "view-title";
-  heading.textContent = "Alignment";
-  container.appendChild(heading);
-
   container.appendChild(renderActions());
   container.appendChild(renderAssignmentGrid(game));
   container.appendChild(renderPlayerSummary(game));
