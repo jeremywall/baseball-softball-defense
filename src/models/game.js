@@ -1,10 +1,13 @@
-import { getFieldPositions, maxOutfielders, REQUIRED_INFIELD_COUNT } from "./positions.js";
+import { getFieldPositions, maxOutfielders, infieldPositionsFor } from "./positions.js";
 
-// HR-7: shortfall in attendance is absorbed by fielding fewer outfielders
-// (down to a minimum of 1), never by leaving an infield/battery slot empty.
+// HR-7: shortfall in attendance is absorbed by fielding fewer outfielders,
+// never by leaving an infield/battery slot empty — except the special case
+// of exactly 7 present, which drops the catcher in favor of a 2nd
+// outfielder (see infieldPositionsFor in positions.js). The outfield count
+// never actually drops below 2 at any playable attendance as a result.
 export function computeOutfieldCount(alignmentMode, presentCount) {
   const maxOF = maxOutfielders(alignmentMode);
-  const available = presentCount - REQUIRED_INFIELD_COUNT;
+  const available = presentCount - infieldPositionsFor(presentCount).length;
   return Math.max(0, Math.min(maxOF, available));
 }
 
@@ -20,7 +23,7 @@ export function effectiveAlignmentMode(alignmentMode, presentCount) {
 export function createGame({ players, presentPlayerIds, numInnings, alignmentMode, pitcherLimit }) {
   const mode = effectiveAlignmentMode(alignmentMode, presentPlayerIds.length);
   const outfieldCount = computeOutfieldCount(mode, presentPlayerIds.length);
-  const positions = getFieldPositions(mode, outfieldCount);
+  const positions = getFieldPositions(mode, presentPlayerIds.length, outfieldCount);
   const innings = Array.from({ length: numInnings }, (_, i) => ({
     number: i + 1,
     assignments: Object.fromEntries(positions.map((p) => [p.id, null])),

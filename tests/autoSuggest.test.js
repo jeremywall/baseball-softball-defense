@@ -22,11 +22,17 @@ test("autoSuggest on a typical 12-player, 6-inning, 9-position, 1-inning-pitcher
   }
 });
 
-test("autoSuggest handles a short-handed 7-player game (min HR-7 case)", () => {
-  const game = makeGame({ playerCount: 7, numInnings: 6, alignmentMode: 9, pitcherLimit: 2 });
-  autoSuggest(game);
-  assert.ok(isGameComplete(game));
-  assert.equal(game.outfieldCount, 1);
+test("autoSuggest handles a short-handed 7-player game (HR-7's no-catcher, 2-outfielder case) with no hard rule violations", () => {
+  for (let trial = 0; trial < 25; trial++) {
+    const game = makeGame({ playerCount: 7, numInnings: 6, alignmentMode: 9, pitcherLimit: 2 });
+    autoSuggest(game);
+    assert.ok(isGameComplete(game));
+    assert.equal(game.outfieldCount, 2);
+    // No catcher slot exists this game, so autoSuggest must never invent one.
+    assert.ok(!("C" in game.innings[0].assignments));
+    const violations = validateAll(game);
+    assert.deepEqual(violations, [], `trial ${trial}: ${JSON.stringify(violations)}`);
+  }
 });
 
 test("autoSuggest is randomized: the same inputs produce more than one distinct alignment", () => {

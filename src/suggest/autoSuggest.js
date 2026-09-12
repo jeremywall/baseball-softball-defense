@@ -67,20 +67,24 @@ export function autoSuggest(game) {
     }
 
     // Catcher: prefer someone who won't pitch this game, or who hasn't
-    // caught 3 innings yet (HR-1).
-    const catcherCandidates = [...fielders].sort((a, b) => {
-      const sa = stats.get(a);
-      const sb = stats.get(b);
-      const aRisky = usedAsPitcher.has(a) && sa.catcher >= 3 ? 1 : 0;
-      const bRisky = usedAsPitcher.has(b) && sb.catcher >= 3 ? 1 : 0;
-      if (aRisky !== bRisky) return aRisky - bRisky;
-      return sa.catcher - sb.catcher;
-    });
-    const catcher = catcherCandidates[0];
-    if (catcher) {
-      inning.assignments.C = catcher;
-      applyStatus(stats.get(catcher), "C");
-      fielders.splice(fielders.indexOf(catcher), 1);
+    // caught 3 innings yet (HR-1). Skipped entirely at 7 present, where
+    // the position set has no catcher (a 2nd outfielder instead — see
+    // infieldPositionsFor in models/positions.js).
+    if (positionIds.includes("C")) {
+      const catcherCandidates = [...fielders].sort((a, b) => {
+        const sa = stats.get(a);
+        const sb = stats.get(b);
+        const aRisky = usedAsPitcher.has(a) && sa.catcher >= 3 ? 1 : 0;
+        const bRisky = usedAsPitcher.has(b) && sb.catcher >= 3 ? 1 : 0;
+        if (aRisky !== bRisky) return aRisky - bRisky;
+        return sa.catcher - sb.catcher;
+      });
+      const catcher = catcherCandidates[0];
+      if (catcher) {
+        inning.assignments.C = catcher;
+        applyStatus(stats.get(catcher), "C");
+        fielders.splice(fielders.indexOf(catcher), 1);
+      }
     }
 
     // Remaining infield slots and outfield slots: balance each player's own

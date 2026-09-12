@@ -167,10 +167,12 @@ source.
    - **Alignment mode**: 9 defensive positions (3 outfielders) or 10
      defensive positions (4 outfielders), as two radio buttons. This sets
      the *maximum* number of outfielders; the actual number used also
-     depends on attendance — see HR-7 in §6.1, which fills the 6
+     depends on attendance — see HR-7 in §6.1, which fills the
      infield/battery positions first and reduces the outfield count (not
      the infield count) when fewer players are present than the mode
-     calls for. **The radio auto-selects with attendance**: every time a
+     calls for, except at exactly 7 present (HR-7's special case: catcher
+     dropped for a 2nd outfielder instead). **The radio auto-selects with
+     attendance**: every time a
      checkbox is toggled (including via "All Present"), the mode is reset
      to 9-position for 9 or fewer present, or 10-position for 10 or more —
      since a 4th outfielder needs at least 10 players (6 infield/battery +
@@ -308,7 +310,7 @@ rules as they're provided; each entry should become one rule module under
 | HR-4 | No player may be benched for a second inning until every present player has been benched at least once in that game (i.e. bench turns must round-robin through the full present roster before anyone repeats). |
 | HR-5 | Every player must play at least one inning of infield within the first 3 innings of the game. |
 | HR-6 | Every player must play a minimum of 2 innings in the infield in a game. |
-| HR-7 | A game requires a minimum of 7 present players to be played. When fewer players are present than the chosen alignment mode's full complement (9 or 10), the 6 infield/battery positions (Catcher, Pitcher, 1B, 2B, 3B, SS) must still all be filled every inning, and the shortfall is absorbed by fielding fewer outfielders (down to a minimum of 1) rather than leaving an infield/battery position empty. |
+| HR-7 | A game requires a minimum of 7 present players to be played. When fewer players are present than the chosen alignment mode's full complement (9 or 10), the shortfall is absorbed by fielding fewer outfielders rather than leaving an infield/battery position empty — **except at exactly 7 present**, where the catcher position is dropped in favor of a 2nd outfielder instead (Pitcher, 1B, 2B, 3B, SS + 2 outfielders = 7), rather than a full catcher/infield complement behind a single lone outfielder. This means the outfield count never actually drops below 2 at any playable attendance: 2 at exactly 7 present (via the catcher swap), and at least 2 at 8+ present (8 − 6 infield/battery = 2). At 8 or more present, all 6 infield/battery positions (Catcher, Pitcher, 1B, 2B, 3B, SS) are filled every inning as before. |
 | HR-8 | Every present player must play a defensive position (any position, not bench) for at least 2 full innings in the game. |
 | HR-9 | A player may pitch at most 1 inning per game if the game's "Pitcher inning limit" setting is on, or at most 2 innings per game if it's off (see Game setup, §5). This is a per-game configurable limit, not a fixed constant — the rules engine reads the max from the game's setting rather than hardcoding it. |
 | HR-10 | Once a player is moved off the pitcher position, they cannot pitch again later in the same game — even if they haven't yet reached the HR-9 innings limit. A player's pitching innings must be one uninterrupted stint at pitcher; there's no returning to pitch after being pulled. |
@@ -316,7 +318,9 @@ rules as they're provided; each entry should become one rule module under
 For HR-2, HR-5, and HR-6, "infield" means the positions **Catcher,
 Pitcher, 1B, 2B, 3B, and SS** — i.e. the `infield` position category from
 §4 (Core Domain Model), which by league convention includes the battery
-positions, not just the four infield dirt positions.
+positions, not just the four infield dirt positions. In a 7-present game
+(HR-7's special case), Catcher isn't fielded at all, so "infield" there
+is just Pitcher, 1B, 2B, 3B, and SS.
 
 As more hard rules are provided, add them here (numbered HR-7, HR-8, ...)
 before turning them into code, so the full set of constraints stays visible

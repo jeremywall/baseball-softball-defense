@@ -9,9 +9,13 @@ test("computeOutfieldCount: full attendance uses the mode's max outfielders", ()
 });
 
 test("computeOutfieldCount: shortfall reduces outfield, never below the min needed for HR-7", () => {
-  assert.equal(computeOutfieldCount(9, 7), 1); // 7 present = 6 infield + 1 outfielder
   assert.equal(computeOutfieldCount(9, 8), 2);
-  assert.equal(computeOutfieldCount(10, 7), 1);
+});
+
+test("computeOutfieldCount: exactly 7 present drops the catcher for a 2nd outfielder", () => {
+  // 7 present = Pitcher/1B/2B/3B/SS (no catcher) + 2 outfielders.
+  assert.equal(computeOutfieldCount(9, 7), 2);
+  assert.equal(computeOutfieldCount(10, 7), 2);
 });
 
 test("effectiveAlignmentMode: falls back to 9-position mode at 9 or fewer present", () => {
@@ -31,4 +35,18 @@ test("createGame: 10-position mode requested with 9 present actually builds a 9-
   const positionIds = game.positions.map((p) => p.id);
   assert.ok(positionIds.includes("CF"));
   assert.ok(!positionIds.includes("LC"));
+});
+
+test("createGame: exactly 7 present has no catcher position and 2 outfielders", () => {
+  const game = makeGame({ playerCount: 7, numInnings: 6, alignmentMode: 9, pitcherLimit: 2 });
+  const positionIds = game.positions.map((p) => p.id);
+  assert.ok(!positionIds.includes("C"));
+  assert.equal(game.outfieldCount, 2);
+  assert.equal(positionIds.length, 7); // P, 1B, 2B, 3B, SS, + 2 outfielders
+});
+
+test("createGame: 8 present still has a catcher (7-present drop is exact, not <=7)", () => {
+  const game = makeGame({ playerCount: 8, numInnings: 6, alignmentMode: 9, pitcherLimit: 2 });
+  const positionIds = game.positions.map((p) => p.id);
+  assert.ok(positionIds.includes("C"));
 });
